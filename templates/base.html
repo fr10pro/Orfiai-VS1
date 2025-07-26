@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StreamHub - Your Video Streaming Platform{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block description %}StreamHub - Watch your favorite videos online. High-quality streaming platform with thousands of videos.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}video streaming, online videos, entertainment, StreamHub{% endblock %}">
+    <meta name="author" content="StreamHub">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}StreamHub - Video Streaming Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Watch your favorite videos online with StreamHub{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}/static/logo.png{% endblock %}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="{% block twitter_title %}StreamHub - Video Streaming Platform{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Watch your favorite videos online with StreamHub{% endblock %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        .video-card:hover .overlay {
+            opacity: 1;
+        }
+        
+        .hashtag {
+            @apply inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-1 mb-1;
+        }
+        
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200;
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200;
+        }
+        
+        .btn-danger {
+            @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200;
+        }
+        
+        .form-input {
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+        }
+        
+        .form-textarea {
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">StreamHub</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 transition duration-200">Home</a>
+                    <a href="/admin" class="text-gray-700 hover:text-blue-600 transition duration-200">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p>&copy; 2025 StreamHub. All rights reserved.</p>
+                <p class="text-gray-400 mt-2">Your premium video streaming platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Confirm delete actions
+        function confirmDelete(videoTitle) {
+            return confirm(`Are you sure you want to delete "${videoTitle}"? This action cannot be undone.`);
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

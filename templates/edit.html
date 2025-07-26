@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ video.title }} - StreamHub{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="/admin" class="text-blue-600 hover:text-blue-800 flex items-center">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Admin Panel
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Edit Video</h1>
+    
+    <form action="/admin/edit/{{ video.id }}" method="post" enctype="multipart/form-data" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                    Video Title *
+                </label>
+                <input type="text" 
+                       id="title" 
+                       name="title" 
+                       required 
+                       value="{{ video.title }}"
+                       class="form-input">
+            </div>
+            
+            <div>
+                <label for="streamtape_url" class="block text-sm font-medium text-gray-700 mb-2">
+                    Streamtape Embed URL *
+                </label>
+                <input type="url" 
+                       id="streamtape_url" 
+                       name="streamtape_url" 
+                       required 
+                       value="{{ video.streamtape_url }}"
+                       class="form-input">
+            </div>
+        </div>
+        
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                Description
+            </label>
+            <textarea id="description" 
+                      name="description" 
+                      rows="4" 
+                      class="form-textarea">{{ video.description if video.description else '' }}</textarea>
+        </div>
+        
+        <div>
+            <label for="hashtags" class="block text-sm font-medium text-gray-700 mb-2">
+                Hashtags
+            </label>
+            <input type="text" 
+                   id="hashtags" 
+                   name="hashtags" 
+                   value="{{ video.hashtags if video.hashtags else '' }}"
+                   class="form-input"
+                   placeholder="#action,#thriller,#2024">
+            <p class="text-sm text-gray-500 mt-1">Separate tags with commas (e.g., #action,#thriller,#2024)</p>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Current Banner
+            </label>
+            <div class="mb-4">
+                <img src="/{{ video.banner_path }}" 
+                     alt="{{ video.title }}" 
+                     class="h-32 w-48 object-cover rounded-lg border">
+            </div>
+            
+            <label for="banner" class="block text-sm font-medium text-gray-700 mb-2">
+                Upload New Banner (Optional)
+            </label>
+            <input type="file" 
+                   id="banner" 
+                   name="banner" 
+                   accept="image/*" 
+                   class="form-input">
+            <p class="text-sm text-gray-500 mt-1">Leave empty to keep current banner</p>
+        </div>
+        
+        <div class="flex justify-between">
+            <a href="/admin" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Update Video
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Video Preview -->
+<div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Current Video Preview</h2>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+            <h3 class="font-medium text-gray-700 mb-2">Video Player</h3>
+            <div class="bg-black rounded-lg overflow-hidden">
+                <iframe 
+                    src="{{ video.embed_url }}" 
+                    width="100%" 
+                    height="300" 
+                    allowfullscreen 
+                    allowtransparency 
+                    allow="autoplay" 
+                    scrolling="no" 
+                    frameborder="0">
+                </iframe>
+            </div>
+        </div>
+        
+        <div>
+            <h3 class="font-medium text-gray-700 mb-2">Video Information</h3>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Title:</span>
+                    <p class="text-gray-800">{{ video.title }}</p>
+                </div>
+                
+                {% if video.description %}
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Description:</span>
+                    <p class="text-gray-800 text-sm">{{ video.description }}</p>
+                </div>
+                {% endif %}
+                
+                {% if video.hashtag_list %}
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Tags:</span>
+                    <div class="mt-1">
+                        {% for tag in video.hashtag_list %}
+                        <span class="hashtag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Created:</span>
+                    <p class="text-gray-800 text-sm">{{ video.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                </div>
+                
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Last Updated:</span>
+                    <p class="text-gray-800 text-sm">{{ video.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                </div>
+                
+                <div class="pt-2">
+                    <a href="/watch/{{ video.id }}" 
+                       target="_blank"
+                       class="text-blue-600 hover:text-blue-800 text-sm">
+                        View Public Page →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - StreamHub{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Admin Panel</h1>
+    <p class="text-gray-600 text-lg">Manage your video content</p>
+</div>
+
+<!-- Upload Form -->
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Upload New Video</h2>
+    
+    <form action="/admin/upload" method="post" enctype="multipart/form-data" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                    Video Title *
+                </label>
+                <input type="text" 
+                       id="title" 
+                       name="title" 
+                       required 
+                       class="form-input"
+                       placeholder="Enter video title">
+            </div>
+            
+            <div>
+                <label for="streamtape_url" class="block text-sm font-medium text-gray-700 mb-2">
+                    Streamtape Embed URL *
+                </label>
+                <input type="url" 
+                       id="streamtape_url" 
+                       name="streamtape_url" 
+                       required 
+                       class="form-input"
+                       placeholder="https://streamtape.com/e/xxxxx/">
+            </div>
+        </div>
+        
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                Description
+            </label>
+            <textarea id="description" 
+                      name="description" 
+                      rows="4" 
+                      class="form-textarea"
+                      placeholder="Enter video description (optional)"></textarea>
+        </div>
+        
+        <div>
+            <label for="hashtags" class="block text-sm font-medium text-gray-700 mb-2">
+                Hashtags
+            </label>
+            <input type="text" 
+                   id="hashtags" 
+                   name="hashtags" 
+                   class="form-input"
+                   placeholder="#action,#thriller,#2024">
+            <p class="text-sm text-gray-500 mt-1">Separate tags with commas (e.g., #action,#thriller,#2024)</p>
+        </div>
+        
+        <div>
+            <label for="banner" class="block text-sm font-medium text-gray-700 mb-2">
+                Banner Image *
+            </label>
+            <input type="file" 
+                   id="banner" 
+                   name="banner" 
+                   accept="image/*" 
+                   required 
+                   class="form-input">
+            <p class="text-sm text-gray-500 mt-1">Upload a banner image for the video (JPG, PNG, etc.)</p>
+        </div>
+        
+        <div class="flex justify-end">
+            <button type="submit" class="btn-primary">
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Upload Video
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Video Management -->
+<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-2xl font-semibold text-gray-800">Manage Videos</h2>
+        <p class="text-gray-600 mt-1">{{ videos|length }} video(s) in your library</p>
+    </div>
+    
+    {% if videos %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Video
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Details
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Created
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for video in videos %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img src="/{{ video.banner_path }}" 
+                                 alt="{{ video.title }}" 
+                                 class="h-16 w-24 object-cover rounded-lg mr-4">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ video.title }}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    ID: {{ video.id }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">
+                            {% if video.description %}
+                                {{ video.description[:100] }}{% if video.description|length > 100 %}...{% endif %}
+                            {% else %}
+                                <span class="text-gray-400">No description</span>
+                            {% endif %}
+                        </div>
+                        {% if video.hashtag_list %}
+                        <div class="mt-2">
+                            {% for tag in video.hashtag_list[:3] %}
+                            <span class="hashtag text-xs">{{ tag }}</span>
+                            {% endfor %}
+                            {% if video.hashtag_list|length > 3 %}
+                            <span class="text-xs text-gray-400">+{{ video.hashtag_list|length - 3 }} more</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ video.created_at.strftime('%b %d, %Y') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <a href="/watch/{{ video.id }}" 
+                               class="text-blue-600 hover:text-blue-900"
+                               target="_blank">
+                                View
+                            </a>
+                            <a href="/admin/edit/{{ video.id }}" 
+                               class="text-indigo-600 hover:text-indigo-900">
+                                Edit
+                            </a>
+                            <form action="/admin/delete/{{ video.id }}" 
+                                  method="post" 
+                                  class="inline"
+                                  onsubmit="return confirmDelete('{{ video.title }}')">
+                                <button type="submit" 
+                                        class="text-red-600 hover:text-red-900">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No videos uploaded yet</h3>
+        <p class="text-gray-500">Upload your first video using the form above.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Admin Statistics -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+        <div class="flex items-center">
+            <svg class="h-8 w-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <div>
+                <div class="text-2xl font-bold">{{ videos|length }}</div>
+                <div class="text-blue-100">Total Videos</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+        <div class="flex items-center">
+            <svg class="h-8 w-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <div class="text-2xl font-bold">{{ videos|length }}</div>
+                <div class="text-green-100">Published</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+        <div class="flex items-center">
+            <svg class="h-8 w-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1h2a1 1 0 011 1v1m0 0h8m-8 0a1 1 0 00-1 1v3M9 7h6"></path>
+            </svg>
+            <div>
+                <div class="text-2xl font-bold">
+                    {% set total_tags = [] %}
+                    {% for video in videos %}
+                        {% set _ = total_tags.extend(video.hashtag_list) %}
+                    {% endfor %}
+                    {{ total_tags|length }}
+                </div>
+                <div class="text-purple-100">Total Tags</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
